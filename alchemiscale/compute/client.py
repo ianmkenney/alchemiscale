@@ -9,7 +9,6 @@ from typing import List, Tuple, Optional, Dict, Union
 import json
 from urllib.parse import urljoin
 from functools import wraps
-import base64
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -137,12 +136,10 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
         json_bytes = json_rep.encode("utf-8")
 
         compressor = zstd.ZstdCompressor()
-        compressed = compressor.compress(json_bytes)
-
-        base64_encoded = base64.b64encode(compressed).decode("utf-8")
+        compressed_pdr = compressor.compress(json_bytes)
 
         data = dict(
-            protocoldagresult=base64_encoded,
+            protocoldagresult=compressed_pdr,
             compute_service_id=str(compute_service_id),
         )
 

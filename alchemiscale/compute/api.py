@@ -9,7 +9,6 @@ import os
 import json
 from datetime import datetime, timedelta
 import random
-import base64
 
 from fastapi import FastAPI, APIRouter, Body, Depends, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -335,8 +334,7 @@ async def set_task_result(
     task_sk = ScopedKey.from_str(task_scoped_key)
     validate_scopes(task_sk.scope, token)
 
-    # decode b64 and decompress the zstd bytes back into json
-    protocoldagresult = base64.b64decode(protocoldagresult)
+    # decompress the zstd bytes back into json
     decompressor = zstd.ZstdDecompressor()
     protocoldagresult = decompressor.decompress(protocoldagresult)
 
