@@ -9,6 +9,7 @@ from typing import Union, List, Dict, Optional, Tuple, Any, Iterable
 import json
 from itertools import chain
 from functools import lru_cache
+import base64
 
 from async_lru import alru_cache
 import networkx as nx
@@ -27,6 +28,7 @@ from ..storage.models import (
     TaskStatusEnum,
     NetworkStateEnum,
 )
+from ..storage.objectstore import decompress_pdr
 from ..strategies import Strategy
 from ..validators import validate_network_nonself
 
@@ -1352,14 +1354,11 @@ class AlchemiscaleClient(AlchemiscaleBaseClient):
     async def _async_get_protocoldagresult(
         self, protocoldagresultref, transformation, route, compress
     ):
-        pdr_json = await self._get_resource_async(
+        pdr_base64_compressed = await self._get_resource_async(
             f"/transformations/{transformation}/{route}/{protocoldagresultref}",
             compress=compress,
         )
-
-        pdr = GufeTokenizable.from_dict(
-            json.loads(pdr_json[0], cls=JSON_HANDLER.decoder)
-        )
+        pdr = decompress_pdr(base64.b64decode(pdr_base64_compressed[0].encode("utf-8")))
 
         return pdr
 

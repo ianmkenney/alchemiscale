@@ -6,6 +6,7 @@
 
 from typing import Dict, List, Optional, Union
 from collections import Counter
+import base64
 
 from fastapi import FastAPI, APIRouter, Body, Depends, HTTPException, Request
 from fastapi import status as http_status
@@ -1046,18 +1047,15 @@ def get_protocoldagresult(
     # we leave each ProtocolDAGResult in string form to avoid
     # deserializing/reserializing here; just passing through to client
     try:
-        pdr: str = s3os.pull_protocoldagresult(
-            pdr_sk, transformation_sk, return_as="json", ok=ok
-        )
+        pdr_bytes: str = s3os.pull_protocoldagresult(pdr_sk, transformation_sk, ok=ok)
     except Exception:
         # if we fail to get the object with the above, fall back to
         # location-based retrieval
-        pdr: str = s3os.pull_protocoldagresult(
+        pdr_bytes: str = s3os.pull_protocoldagresult(
             location=protocoldagresultref.location,
-            return_as="json",
             ok=ok,
         )
-
+    pdr = base64.b64encode(pdr_bytes).decode("utf-8")
     return [pdr]
 
 

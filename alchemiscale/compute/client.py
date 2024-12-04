@@ -9,6 +9,7 @@ from typing import List, Tuple, Optional, Dict, Union
 import json
 from urllib.parse import urljoin
 from functools import wraps
+import base64
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -26,6 +27,7 @@ from ..base.client import (
 )
 from ..models import Scope, ScopedKey
 from ..storage.models import TaskHub, Task, ComputeServiceID, TaskStatusEnum
+from ..storage.objectstore import compress_pdr, decompress_pdr
 
 
 class AlchemiscaleComputeClientError(AlchemiscaleBaseClientError): ...
@@ -119,9 +121,13 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
             f"/tasks/{task}/transformation/gufe"
         )
 
+        if protocoldagresult is not None:
+            protocoldagresult = decompress_pdr(base64.b64decode(protocoldagresult))
+
         return (
             json_to_gufe(transformation),
-            json_to_gufe(protocoldagresult) if protocoldagresult is not None else None,
+            # json_to_gufe(protocoldagresult) if protocoldagresult is not None else None,
+            protocoldagresult,
         )
 
     def set_task_result(
@@ -131,15 +137,8 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
         compute_service_id: Optional[ComputeServiceID] = None,
     ) -> ScopedKey:
 
-        keyed_chain_rep = KeyedChain.from_gufe(protocoldagresult).to_keyed_chain_rep()
-        json_rep = json.dumps(keyed_chain_rep, cls=JSON_HANDLER.encoder)
-        json_bytes = json_rep.encode("utf-8")
-
-        compressor = zstd.ZstdCompressor()
-        compressed_pdr = compressor.compress(json_bytes)
-
         data = dict(
-            protocoldagresult=compressed_pdr,
+            protocoldagresult=compress_pdr(protocoldagresult),
             compute_service_id=str(compute_service_id),
         )
 

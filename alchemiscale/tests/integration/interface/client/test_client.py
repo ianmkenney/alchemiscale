@@ -10,6 +10,7 @@ import networkx as nx
 
 from alchemiscale.models import ScopedKey, Scope
 from alchemiscale.storage.models import TaskStatusEnum, NetworkStateEnum
+from alchemiscale.storage.objectstore import compress_pdr
 from alchemiscale.storage.cypher import cypher_list_from_scoped_keys
 from alchemiscale.interface import client
 from alchemiscale.tests.integration.interface.utils import (
@@ -1850,7 +1851,7 @@ class TestClient:
             protocoldagresults.append(protocoldagresult)
 
             protocoldagresultref = s3os_server.push_protocoldagresult(
-                protocoldagresult, transformation=transformation_sk
+                compress_pdr(protocoldagresult), transformation=transformation_sk
             )
 
             n4js.set_task_result(
