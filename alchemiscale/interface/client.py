@@ -23,12 +23,12 @@ from ..base.client import (
     AlchemiscaleBaseClientError,
     use_session,
 )
+from ..compression import decompress_gufe_zstd
 from ..models import Scope, ScopedKey
 from ..storage.models import (
     TaskStatusEnum,
     NetworkStateEnum,
 )
-from ..storage.objectstore import decompress_pdr
 from ..strategies import Strategy
 from ..validators import validate_network_nonself
 
@@ -1358,7 +1358,9 @@ class AlchemiscaleClient(AlchemiscaleBaseClient):
             f"/transformations/{transformation}/{route}/{protocoldagresultref}",
             compress=compress,
         )
-        pdr = decompress_pdr(base64.b64decode(pdr_base64_compressed[0].encode("utf-8")))
+        pdr = decompress_gufe_zstd(
+            base64.b64decode(pdr_base64_compressed[0].encode("utf-8"))
+        )
 
         return pdr
 

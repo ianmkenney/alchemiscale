@@ -42,27 +42,6 @@ def get_s3os(settings: S3ObjectStoreSettings, endpoint_url=None) -> "S3ObjectSto
     )
 
 
-def compress_pdr(protocoldagresult: ProtocolDAGResult) -> bytes:
-    keyed_chain_rep = KeyedChain.from_gufe(protocoldagresult).to_keyed_chain_rep()
-    json_rep = json.dumps(keyed_chain_rep, cls=JSON_HANDLER.encoder)
-    json_bytes = json_rep.encode("utf-8")
-
-    compressor = zstd.ZstdCompressor()
-    compressed_pdr = compressor.compress(json_bytes)
-
-    return compressed_pdr
-
-
-def decompress_pdr(pdr_bytes: bytes) -> ProtocolDAGResult:
-    decompressor = zstd.ZstdDecompressor()
-    protocoldagresult = decompressor.decompress(pdr_bytes)
-
-    pdr_keyed_chain_rep = json.loads(protocoldagresult, cls=JSON_HANDLER.decoder)
-    pdr_keyed_chain = KeyedChain.from_keyed_chain_rep(pdr_keyed_chain_rep)
-    pdr = pdr_keyed_chain.to_gufe()
-    return pdr
-
-
 class S3ObjectStoreError(Exception): ...
 
 

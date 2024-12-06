@@ -25,9 +25,9 @@ from ..base.client import (
     AlchemiscaleBaseClientError,
     json_to_gufe,
 )
+from ..compression import compress_gufe_zstd, decompress_gufe_zstd
 from ..models import Scope, ScopedKey
 from ..storage.models import TaskHub, Task, ComputeServiceID, TaskStatusEnum
-from ..storage.objectstore import compress_pdr, decompress_pdr
 
 
 class AlchemiscaleComputeClientError(AlchemiscaleBaseClientError): ...
@@ -122,7 +122,9 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
         )
 
         if protocoldagresult is not None:
-            protocoldagresult = decompress_pdr(base64.b64decode(protocoldagresult))
+            protocoldagresult = decompress_gufe_zstd(
+                base64.b64decode(protocoldagresult)
+            )
 
         return (
             json_to_gufe(transformation),
@@ -138,7 +140,7 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
     ) -> ScopedKey:
 
         data = dict(
-            protocoldagresult=compress_pdr(protocoldagresult),
+            protocoldagresult=compress_gufe_zstd(protocoldagresult),
             compute_service_id=str(compute_service_id),
         )
 

@@ -31,13 +31,14 @@ from ..base.api import (
     gufe_to_json,
     GzipRoute,
 )
+from ..compression import decompress_gufe_zstd
 from ..settings import (
     get_base_api_settings,
     get_compute_api_settings,
     ComputeAPISettings,
 )
 from ..storage.statestore import Neo4jStore, get_n4js
-from ..storage.objectstore import S3ObjectStore, decompress_pdr
+from ..storage.objectstore import S3ObjectStore
 from ..storage.models import (
     ProtocolDAGResultRef,
     ComputeServiceID,
@@ -334,7 +335,7 @@ async def set_task_result(
     task_sk = ScopedKey.from_str(task_scoped_key)
     validate_scopes(task_sk.scope, token)
 
-    pdr = decompress_pdr(protocoldagresult_)
+    pdr = decompress_gufe_zstd(protocoldagresult_)
 
     tf_sk, _ = n4js.get_task_transformation(
         task=task_scoped_key,
