@@ -309,7 +309,7 @@ def retrieve_task_transformation(
                 location=protocoldagresultref.location,
                 ok=True,
             )
-        pdr = base64.b64encode(pdr_bytes).decode("utf-8")
+        pdr = pdr_bytes.decode("latin-1")
     else:
         pdr = None
 

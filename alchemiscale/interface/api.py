@@ -1055,7 +1055,8 @@ def get_protocoldagresult(
             location=protocoldagresultref.location,
             ok=ok,
         )
-    pdr = base64.b64encode(pdr_bytes).decode("utf-8")
+    pdr = pdr_bytes.decode("latin-1")
+
     return [pdr]
 
 

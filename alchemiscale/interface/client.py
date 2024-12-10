@@ -1358,9 +1358,7 @@ class AlchemiscaleClient(AlchemiscaleBaseClient):
             f"/transformations/{transformation}/{route}/{protocoldagresultref}",
             compress=compress,
         )
-        pdr = decompress_gufe_zstd(
-            base64.b64decode(pdr_base64_compressed[0].encode("utf-8"))
-        )
+        pdr = decompress_gufe_zstd(pdr_base64_compressed[0].encode("latin-1"))
 
         return pdr
 

@@ -123,7 +123,7 @@ class AlchemiscaleComputeClient(AlchemiscaleBaseClient):
 
         if protocoldagresult is not None:
             protocoldagresult = decompress_gufe_zstd(
-                base64.b64decode(protocoldagresult)
+                protocoldagresult.encode("latin-1")
             )
 
         return (
