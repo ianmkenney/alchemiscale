@@ -62,6 +62,8 @@ class ComputeManager:
 
         self.logger = logging.LoggerAdapter(logger, extra)
 
+        self.setup()
+
     def _register(self):
         try:
             self.client.register(self.compute_manager_id)
@@ -71,6 +73,23 @@ class ComputeManager:
 
     def _deregister(self):
         self.client.deregister(self.compute_manager_id)
+        self.teardown()
+
+    def setup(self):
+        """Setup method for developer override.
+
+        This is to be defined for individual compute platforms and is
+        run at the end of manager initialization.
+        """
+        pass
+
+    def teardown(self):
+        """Teardown method for developer override.
+
+        This is to be defined for individual compute platforms and
+        acts as a cleanup after deregistration.
+        """
+        pass
 
     def start(self, max_cycles: int | None = None):
         self.logger.info(f"Starting up compute manager '{self.settings.name}'")
